@@ -223,7 +223,9 @@ main {
     display: block !important;
     z-index: 1001;
   }
-
+.hide{
+  display: none;
+}
   .main-nav.active {
     right: 0 !important;
     display: flex !important;
