@@ -6,115 +6,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-Commerce Store{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230F172A'/><path d='M 44 22 C 36 15, 22 18, 21 32 C 20 46, 36 49, 44 42' fill='none' stroke='%2306B6D4' stroke-width='6' stroke-linecap='round'/><circle cx='32' cy='32' r='4.5' fill='%2306B6D4'/></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .cart-badge {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 9999px;
+            padding: 2px 7px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
+
 <div class="preloader" id="preloader">
     <div class="preloader-dots">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span><span></span><span></span>
     </div>
 </div> 
-<div class="top-bar">
+
+<div class="top-bar desktop-only">
     <div class="container">
         <div class="top-bar-left">
-            <a href="tel:080xxxxxxx00">
-                <i class="fas fa-phone"></i> 080xxxxxxx00
-            </a>
+            <a href="tel:080xxxxxxx00"><i class="fas fa-phone"></i> 080xxxxxxx00</a>
             <span class="top-bar-separator">|</span>
-            <a href="mailto:codeapha@ecommerce.com">
-                <i class="fas fa-envelope"></i> codeapha@ecommerce.com
-            </a>
+            <a href="mailto:codeapha@ecommerce.com"><i class="fas fa-envelope"></i> codeapha@ecommerce.com</a>
         </div>
         <div class="top-bar-right"> 
             {% if user.is_authenticated %}
-                <a href="{% url 'accounts:profile' %}">
-                    <i class="fas fa-user"></i> {{ user.username }}
-                </a>
+                <a href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
                 <span class="top-bar-separator">|</span>
-                <a href="{% url 'accounts:logout' %}">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+                <a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
             {% else %}
-                <a href="{% url 'accounts:login' %}">
-                    <i class="fas fa-user"></i> Signin
-                </a>
+                <a href="{% url 'accounts:login' %}"><i class="fas fa-user"></i> Signin</a>
                 <span class="top-bar-separator">|</span>
-                <a href="{% url 'accounts:register' %}">
-                    <i class="fas fa-user-plus"></i> Register
-                </a>  
+                <a href="{% url 'accounts:register' %}"><i class="fas fa-user-plus"></i> Register</a>  
             {% endif %}
         </div>
     </div>
 </div>
- 
+
 <header class="main-header" id="main-header">
-    <div class="container"> 
+    <div class="container header-container"> 
         <a href="{% url 'products:product_list' %}" class="logo">
-            <div class="logo-img">
-                <img src="{% static 'img/favicon.png' %}" 
-                     style="width: 100px; height: auto; border-radius: 20%;" 
-                     alt="CodeAlpha">
-            </div>
-            <div class="logo-text">CAlpha<span></span></div>
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 60' width='240' height='60'><rect x='5' y='5' width='50' height='50' rx='12' fill='%230F172A'/><path d='M 38 21 C 32 16, 21 18, 20 30 C 19 42, 32 44, 38 39' fill='none' stroke='%2306B6D4' stroke-width='4.5' stroke-linecap='round'/><circle cx='29' cy='30' r='3.5' fill='%2306B6D4'/><text x='70' y='36' font-family='sans-serif' font-weight='800' font-size='24' fill='%230F172A' letter-spacing='1.5'>CALPHA</text><text x='71' y='49' font-family='sans-serif' font-weight='600' font-size='10' fill='%2364748B' letter-spacing='3'>E - COMMERCE</text></svg>" alt="CALPHA Logo" />
         </a> 
-        <button class="mobile-toggle" id="mobile-toggle" 
-                aria-label="Toggle navigation menu" 
-                aria-expanded="false" 
-                aria-controls="main-nav">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </button> 
-        <nav class="bottom-nav">
-            <a href="{% url 'products:product_list' %}" class="nav-link">
-                <i class="fas fa-store nav-icon"></i> Shop
-            </a>
+
+        <!-- Search Bar Block (Overridden only on Shop Page) -->
+        {% block search_bar %}{% endblock %}
+
+        <nav class="main-nav desktop-only" id="main-nav">
+            <a href="{% url 'products:product_list' %}" class="nav-link"><i class="fas fa-store nav-icon"></i> Shop</a>
             <a href="{% url 'cart:cart_detail' %}" class="nav-link">
-                <i class="fas fa-shopping-cart nav-icon"></i> Cart
+                <i class="fas fa-shopping-cart nav-icon"></i> Cart 
+                {% if cart_count %}
+                    <span class="cart-badge">{{ cart_count }}</span>
+                {% endif %}
             </a>
-            <a href="{% url 'orders:order_list' %}" class="nav-link">
-                <i class="fas fa-box nav-icon"></i> Orders
-            </a>
-            <a href="{% url 'history:product_history' %}" class="nav-link">
-                <i class="fas fa-history nav-icon"></i> History
-            </a>
-            <a href="{% url 'wishlist:wishlist_detail' %}" class="nav-link">
-                <i class="fas fa-heart nav-icon"></i> Wishlist
-            </a> 
+            <a href="{% url 'orders:order_list' %}" class="nav-link"><i class="fas fa-box nav-icon"></i> Orders</a>
+            <a href="{% url 'history:product_history' %}" class="nav-link"><i class="fas fa-history nav-icon"></i> History</a>
+            <a href="{% url 'wishlist:wishlist_detail' %}" class="nav-link"><i class="fas fa-heart nav-icon"></i> Wishlist</a> 
         </nav>
     </div>
 </header>
 
 <main>
-    {% block content %}
-        <!-- Page-specific content goes here -->
-    {% endblock %}
+    {% block content %}{% endblock %}
 </main>
 
-<footer class="main-footer">
-    <div class="container">
-        <div class="footer-grid"> 
-            <div class="footer-brand">
-                <div class="footer-social">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div>
-                &copy; CodeAlpha Ecommerce. All rights reserved.
-            </div>
-            <div>Version 1.0.1</div>
-        </div>
-    </div>
-</footer>
+<nav class="mobile-bottom-nav">
+    <a href="{% url 'products:product_list' %}" class="bottom-nav-item active"><i class="fas fa-store"></i><span>Shop</span></a>
+    <a href="{% url 'cart:cart_detail' %}" class="bottom-nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Cart</span>
+        {% if cart_count %}
+            <span class="cart-badge">{{ cart_count }}</span>
+        {% endif %}
+    </a>
+    <a href="{% url 'history:product_history' %}" class="bottom-nav-item"><i class="fas fa-history"></i><span>History</span></a>
+    <a href="{% url 'wishlist:wishlist_detail' %}" class="bottom-nav-item"><i class="far fa-heart"></i><span>Wishlist</span></a>
+    <a href="{% if user.is_authenticated %}{% url 'accounts:profile' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="bottom-nav-item"><i class="far fa-user"></i><span>Account</span></a>
+</nav>
+
 <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

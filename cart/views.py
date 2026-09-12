@@ -19,12 +19,11 @@ def cart_detail(request):
     """Display cart items and total calculation."""
     cart = _get_cart(request)
     items = cart.items.select_related('product').all()
-    total_price = cart.total_price
     
     return render(request, 'cart/cart_detail.html', {
         'cart': cart,
         'items': items,
-        'total_price': total_price
+        'total_price': cart.total_price  # Triggers the @property on Cart
     })
 
 @require_POST

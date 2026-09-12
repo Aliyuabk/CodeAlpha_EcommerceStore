@@ -3,16 +3,26 @@
 
 {% block title %}Shop - CAlpha Store{% endblock %}
 
+{% block search_bar %}
+<form class="app-search-form" onsubmit="return false;">
+    <div class="search-input-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="live-search-input" placeholder="Search for anything..." aria-label="Search">
+    </div>
+    <button type="button" class="filter-btn" aria-label="Filter/Search">
+        <i class="fas fa-sliders-h"></i>
+    </button>
+</form>
+{% endblock %}
+
 {% block content %}
 <div class="products-container">
-    
-
     <h2 class="page-title">Products</h2>
 
     {% if products %}
-        <div class="product-grid">
+        <div class="product-grid" id="product-grid">
             {% for product in products %}
-                <div class="product-card">
+                <div class="product-card" data-name="{{ product.name|lower }}">
                     <div class="image-wrapper">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
@@ -39,10 +49,43 @@
                 </div>
             {% endfor %}
         </div>
+        
+        <div id="no-matches" class="empty-cart-state" style="display: none;">
+            <p>No products match your search query.</p>
+        </div>
     {% else %}
         <div class="empty-cart-state">
             <p>No products are currently available.</p>
         </div>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("live-search-input");
+        const productCards = document.querySelectorAll(".product-card");
+        const noMatchesMsg = document.getElementById("no-matches");
+
+        if (searchInput) {
+            searchInput.addEventListener("keyup", function() {
+                const query = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                productCards.forEach(card => {
+                    const name = card.getAttribute("data-name");
+                    if (name.includes(query)) {
+                        card.style.display = "";
+                        visibleCount++;
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+
+                if (noMatchesMsg) {
+                    noMatchesMsg.style.display = (visibleCount === 0) ? "block" : "none";
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

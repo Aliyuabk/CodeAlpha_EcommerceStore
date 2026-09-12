@@ -29,7 +29,7 @@ def checkout(request):
             address=address,
             city=city,
             postal_code=postal_code,
-            total_amount=cart.total_price,
+            total_amount = cart.total_price,
             is_paid=True  # Simulated successful payment
         )
 

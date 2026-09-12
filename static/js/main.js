@@ -1,553 +1,421 @@
 /* ============================================================
-   KARAMA LOGISTICS - HEADER & MOBILE SIDEBAR JS (main.js)
-   Fixed: Mobile menu, sidebar, accessibility, touch events
+   CALPHA E-COMMERCE — MAIN SCRIPT
+   Modules: Preloader, Mobile Nav, Scroll FX, Search, Lazy Load
    ============================================================ */
+(function () {
+  'use strict';
 
-document.addEventListener('DOMContentLoaded', function() {
+  const $  = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-    // ─── DOM Element References ───
-    const preloader = document.querySelector('.preloader');
-    const mobileToggle = document.querySelector('.mobile-toggle');
-    let mainNav = document.querySelector('.main-nav');
-    const body = document.body;
-    const header = document.querySelector('.main-header');
+  /* ----------------------------------------------------------
+     1. Preloader
+     ---------------------------------------------------------- */
+  function initPreloader() {
+    const preloader = $('.preloader') || $('#preloader');
+    if (!preloader) return;
 
-    // Store original parent for restoring desktop layout
-    let navOriginalParent = mainNav ? mainNav.parentElement : null;
-    let navNextSibling = mainNav ? mainNav.nextElementSibling : null;
+    const hide = () => preloader.classList.add('hidden', 'fade-out');
 
-    // ─── Preloader ───
-    if (preloader) {
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                preloader.classList.add('hidden');
-            }, 800);
-        });
-    }
-
-    // ─── Mobile Overlay ───
-    let mobileOverlay = document.querySelector('.mobile-overlay');
-    if (!mobileOverlay) {
-        mobileOverlay = document.createElement('div');
-        mobileOverlay.className = 'mobile-overlay';
-        mobileOverlay.setAttribute('aria-hidden', 'true');
-        mobileOverlay.setAttribute('role', 'button');
-        mobileOverlay.setAttribute('tabindex', '-1');
-        document.body.appendChild(mobileOverlay);
-    }
-
-    // ─── Sidebar Close Button (inject for mobile) ───
-    let sidebarCloseBtn = document.querySelector('.sidebar-close');
-    if (!sidebarCloseBtn && mainNav) {
-        sidebarCloseBtn = document.createElement('button');
-        sidebarCloseBtn.className = 'sidebar-close';
-        sidebarCloseBtn.setAttribute('aria-label', 'Close navigation menu');
-        sidebarCloseBtn.setAttribute('type', 'button');
-        sidebarCloseBtn.innerHTML = '<i class="fas fa-times"></i>';
-        mainNav.insertBefore(sidebarCloseBtn, mainNav.firstChild);
-    }
-
-    // ─── Focusable elements selector for focus trap ───
-    const FOCUSABLE_SELECTORS = 'a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
-
-    let lastFocusedElement = null;
-    let focusTrapHandler = null;
-
-    // ─── Move nav outside header for mobile sidebar ───
-    function detachNavForMobile() {
-        if (!mainNav || mainNav.parentElement === body) return;
-        navOriginalParent = mainNav.parentElement;
-        navNextSibling = mainNav.nextElementSibling;
-        if (header) {
-            header.insertAdjacentElement('afterend', mainNav);
-        } else {
-            document.body.appendChild(mainNav);
-        }
-    }
-
-    // ─── Move nav back into header for desktop ───
-    function restoreNavForDesktop() {
-        if (!mainNav || !navOriginalParent) return;
-        if (mainNav.parentElement === navOriginalParent) return;
-        if (navNextSibling) {
-            navOriginalParent.insertBefore(mainNav, navNextSibling);
-        } else {
-            navOriginalParent.appendChild(mainNav);
-        }
-    }
-
-    // ─── Open Menu ───
-    function openMenu() {
-        if (!mainNav || !mobileOverlay || !mobileToggle) return;
-        if (mainNav.classList.contains('active')) return;
-
-        // Store last focused element for restoration
-        lastFocusedElement = document.activeElement;
-
-        // CRITICAL FIX: Move nav outside header BEFORE adding active class
-        detachNavForMobile();
-
-        // Force browser to paint the DOM move first
-        // Then add active class so transition triggers properly
-        requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-                mobileToggle.classList.add('active');
-                mobileToggle.setAttribute('aria-expanded', 'true');
-                mainNav.classList.add('active');
-                mobileOverlay.classList.add('active');
-                body.classList.add('menu-open');
-
-                // Prevent background scrolling
-                body.style.overflow = 'hidden';
-                document.documentElement.style.overflow = 'hidden';
-
-                // Enable focus trap inside sidebar
-                enableFocusTrap();
-
-                // Focus first focusable element in sidebar
-                setTimeout(() => {
-                    const focusable = mainNav.querySelectorAll(FOCUSABLE_SELECTORS);
-                    if (focusable.length > 0) {
-                        focusable[0].focus();
-                    }
-                }, 100);
-            });
-        });
-    }
-
-    // ─── Close Menu ───
-    function closeMenu() {
-        if (!mainNav || !mobileOverlay || !mobileToggle) return;
-        if (!mainNav.classList.contains('active')) return;
-
-        mobileToggle.classList.remove('active');
-        mobileToggle.setAttribute('aria-expanded', 'false');
-        mainNav.classList.remove('active');
-        mobileOverlay.classList.remove('active');
-        body.classList.remove('menu-open');
-
-        // Restore scrolling
-        body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-
-        // Disable focus trap
-        disableFocusTrap();
-
-        // Restore focus to toggle button
-        if (lastFocusedElement) {
-            lastFocusedElement.focus();
-            lastFocusedElement = null;
-        } else if (mobileToggle) {
-            mobileToggle.focus();
-        }
-
-        // Wait for transition to finish before moving nav back
-        // This ensures the closing animation plays smoothly
-        const transitionDuration = 400; // matches CSS transition time
-        setTimeout(function() {
-            restoreNavForDesktop();
-        }, transitionDuration);
-    }
-
-    // ─── Toggle Menu ───
-    function toggleMenu() {
-        if (!mainNav) return;
-        if (mainNav.classList.contains('active')) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-    }
-
-    // ─── Focus Trap (accessibility) ───
-    function enableFocusTrap() {
-        if (!mainNav) return;
-
-        focusTrapHandler = function(e) {
-            if (e.key !== 'Tab') return;
-
-            const focusable = Array.from(mainNav.querySelectorAll(FOCUSABLE_SELECTORS))
-                .filter(el => !el.disabled && el.offsetParent !== null);
-
-            if (focusable.length === 0) return;
-
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-
-            if (e.shiftKey) {
-                if (document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                }
-            } else {
-                if (document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
-            }
-        };
-
-        mainNav.addEventListener('keydown', focusTrapHandler);
-    }
-
-    function disableFocusTrap() {
-        if (!mainNav || !focusTrapHandler) return;
-        mainNav.removeEventListener('keydown', focusTrapHandler);
-        focusTrapHandler = null;
-    }
-
-    // ─── Event Listeners ───
-
-    // Mobile toggle click
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-    }
-
-    // Overlay click - closes menu
-    if (mobileOverlay) {
-        mobileOverlay.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
-        });
-    }
-
-    // Sidebar close button
-    if (sidebarCloseBtn) {
-        sidebarCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
-        });
-    }
-
-    // Close menu when clicking nav links (actual navigation only)
-    if (mainNav) {
-        mainNav.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href && href !== '#' && !href.startsWith('#')) {
-                    closeMenu();
-                }
-            });
-        });
-    }
-
-    // Close menu on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && mainNav && mainNav.classList.contains('active')) {
-            closeMenu();
-        }
-    });
-
-    // ─── Touch Swipe to Close Sidebar ───
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    if (mainNav) {
-        mainNav.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-
-        mainNav.addEventListener('touchend', function(e) {
-            const touchEndX = e.changedTouches[0].screenX;
-            const touchEndY = e.changedTouches[0].screenY;
-            const diffX = touchStartX - touchEndX;
-            const diffY = Math.abs(touchStartY - touchEndY);
-
-            if (diffX > 60 && diffY < 100) {
-                closeMenu();
-            }
-        }, { passive: true });
-    }
-
-    // ─── Header Scroll Effect ───
-    let lastScroll = 0;
-
-    function handleHeaderScroll() {
-        if (!header) return;
-        const currentScroll = window.pageYOffset;
-
-        if (currentScroll > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-
-        lastScroll = currentScroll;
-    }
-
-    window.addEventListener('scroll', handleHeaderScroll, { passive: true });
-    handleHeaderScroll();
-
-    // ─── Scroll Reveal Animations ───
-    const revealElements = document.querySelectorAll('.reveal, .fade-in-left, .fade-in-right, .fade-in-scale');
-
-    if (revealElements.length > 0 && 'IntersectionObserver' in window) {
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        });
-
-        revealElements.forEach(el => revealObserver.observe(el));
+    if (document.readyState === 'complete') {
+      setTimeout(hide, 300);
     } else {
-        revealElements.forEach(el => el.classList.add('visible'));
+      window.addEventListener('load', () => setTimeout(hide, 300), { once: true });
     }
+    // Safety fallback
+    setTimeout(hide, 2500);
+  }
 
-    // ─── Counter Animation ───
-    const counters = document.querySelectorAll('.counter');
+  /* ----------------------------------------------------------
+     2. Mobile Navigation
+     ---------------------------------------------------------- */
+ /* ----------------------------------------------------------
+   Mobile Navigation Fix
+   ---------------------------------------------------------- */
+function initMobileNav() {
+  // Flexibly target toggle button or create standard fallback listener
+  const toggle = $('.mobile-toggle') || $('.menu-toggle') || $('.hamburger');
+  const nav    = $('.main-nav') || $('.header-actions');
+  const body   = document.body;
+  if (!toggle || !nav) return;
 
-    if (counters.length > 0 && 'IntersectionObserver' in window) {
-        const counterObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
-                    entry.target.classList.add('counted');
-                    animateCounter(entry.target);
-                }
-            });
-        }, { threshold: 0.5 });
+  let overlay = $('.mobile-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'mobile-overlay';
+    document.body.appendChild(overlay);
+  }
 
-        counters.forEach(counter => counterObserver.observe(counter));
-    }
+  function openMenu() {
+    toggle.classList.add('active');
+    nav.classList.add('active');
+    overlay.classList.add('active');
+    body.classList.add('menu-open');
+  }
 
-    function animateCounter(element) {
-        const target = parseInt(element.getAttribute('data-target')) || 0;
-        const suffix = element.getAttribute('data-suffix') || '';
-        const duration = 2000;
-        const startTime = performance.now();
+  function closeMenu() {
+    toggle.classList.remove('active');
+    nav.classList.remove('active');
+    overlay.classList.remove('active');
+    body.classList.remove('menu-open');
+  }
 
-        function updateCounter(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-            const current = Math.floor(easeOut * target);
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    nav.classList.contains('active') ? closeMenu() : openMenu();
+  });
 
-            element.textContent = current.toLocaleString() + suffix;
+  overlay.addEventListener('click', closeMenu);
+}
 
-            if (progress < 1) {
-                requestAnimationFrame(updateCounter);
-            } else {
-                element.textContent = target.toLocaleString() + suffix;
-            }
+/* ----------------------------------------------------------
+   Global Client-Side Search Fix
+   ---------------------------------------------------------- */
+function initProductSearch() {
+  // Select ALL inputs matching search to support top header search
+  const inputs = $$('input[type="text"], .search-input');
+  const cards  = $$('.product-card');
+  const grid   = $('.product-grid') || (cards[0] ? cards[0].parentElement : null);
+
+  if (!inputs.length || !cards.length) return;
+
+  function filterProducts(query) {
+    const q = query.trim().toLowerCase();
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      // Search in title, heading tags, or data attributes
+      const title = (
+        card.dataset.title || 
+        card.querySelector('.product-title, h3, h4, a')?.textContent || 
+        ''
+      ).toLowerCase();
+      
+      const match = !q || title.includes(q);
+      card.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+
+    // Handle Empty State
+    if (grid) {
+      let emptyMsg = $('.search-empty', grid);
+      if (visibleCount === 0 && q) {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.className = 'search-empty';
+          emptyMsg.style.cssText = 'grid-column: 1/-1; text-align: center; padding: 40px; font-size: 1.1rem; color: #64748b;';
+          grid.appendChild(emptyMsg);
         }
-
-        requestAnimationFrame(updateCounter);
+        emptyMsg.textContent = `No products found matching "${query}".`;
+        emptyMsg.style.display = 'block';
+      } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
     }
+  }
 
-    // ─── Scroll to Top Button ───
-    let scrollTopBtn = document.querySelector('.scroll-top');
+  // Bind input event listener across all search input instances
+  inputs.forEach(input => {
+    input.addEventListener('input', (e) => {
+      const val = e.target.value;
+      // Sync all search boxes if multiple exist
+      inputs.forEach(i => { if (i !== e.target) i.value = val; });
+      filterProducts(val);
+    });
+
+    // Handle Enter Key / Form Submit
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        filterProducts(input.value);
+      }
+    });
+  });
+}
+  /* ----------------------------------------------------------
+     3. Header Scroll Effects & Scroll-to-Top
+     ---------------------------------------------------------- */
+  function initScrollEffects() {
+    const header = $('.main-header');
+
+    let scrollTopBtn = $('.scroll-top');
     if (!scrollTopBtn) {
-        scrollTopBtn = document.createElement('button');
-        scrollTopBtn.className = 'scroll-top';
-        scrollTopBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
-        scrollTopBtn.setAttribute('aria-label', 'Scroll to top');
-        scrollTopBtn.setAttribute('type', 'button');
-        document.body.appendChild(scrollTopBtn);
+      scrollTopBtn = document.createElement('button');
+      scrollTopBtn.className = 'scroll-top';
+      scrollTopBtn.type = 'button';
+      scrollTopBtn.setAttribute('aria-label', 'Scroll to top');
+      scrollTopBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+      document.body.appendChild(scrollTopBtn);
     }
 
-    function toggleScrollTop() {
-        if (!scrollTopBtn) return;
-        if (window.pageYOffset > 400) {
-            scrollTopBtn.classList.add('visible');
+    function onScroll() {
+      const y = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (header) {
+        header.classList.toggle('scrolled', y > 40);
+      }
+
+      if (scrollTopBtn) {
+        scrollTopBtn.classList.toggle('visible', y > 350);
+      }
+    }
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* ----------------------------------------------------------
+     4. Scroll Reveal Animations
+     ---------------------------------------------------------- */
+  function initReveal() {
+    const items = $$('.reveal, .fade-in-left, .fade-in-right, .fade-in-scale');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach(el => el.classList.add('visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    items.forEach(el => observer.observe(el));
+  }
+
+  /* ----------------------------------------------------------
+     5. Lazy Image Loading
+     ---------------------------------------------------------- */
+  function initLazyImages() {
+    const imgs = $$('img[data-src]');
+    if (!imgs.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      imgs.forEach(img => {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+          }
+          observer.unobserve(img);
+        }
+      });
+    });
+
+    imgs.forEach(img => observer.observe(img));
+  }
+
+  /* ----------------------------------------------------------
+     6. Flash Message Dismissal
+     ---------------------------------------------------------- */
+  function initFlashMessages() {
+    $$('.flash-message').forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        msg.style.opacity = '0';
+        msg.style.transform = 'translateY(-15px)';
+        setTimeout(() => msg.remove(), 400);
+      }, 5000);
+    });
+  }
+
+  /* ----------------------------------------------------------
+     7. Password Toggle Visibility
+     ---------------------------------------------------------- */
+  function initPasswordToggle() {
+    $$('.password-toggle').forEach(toggle => {
+      toggle.addEventListener('click', function () {
+        const wrap  = this.closest('.password-input-wrap') || this.parentElement;
+        const input = wrap ? wrap.querySelector('input') : null;
+        const icon  = this.querySelector('i');
+        if (!input || !icon) return;
+
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        icon.classList.toggle('fa-eye', !isPassword);
+        icon.classList.toggle('fa-eye-slash', isPassword);
+      });
+    });
+  }
+
+  /* ----------------------------------------------------------
+     8. Smooth Anchor Link Scrolling
+     ---------------------------------------------------------- */
+  function initSmoothAnchors() {
+    $$('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const id = this.getAttribute('href');
+        if (!id || id === '#') return;
+        const target = document.querySelector(id);
+        if (!target) return;
+
+        e.preventDefault();
+        const header = $('.main-header');
+        const offset = (header ? header.offsetHeight : 0) + 15;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
+    });
+  }
+
+  /* ----------------------------------------------------------
+     9. Client-Side Product Search Filtering
+     ---------------------------------------------------------- */
+  function initProductSearch() {
+    const form  = $('.search-form');
+    const input = $('.search-input');
+    const grid  = $('.product-grid');
+    if (!input || !grid) return;
+
+    const meta  = $('.search-meta');
+    const cards = $$('.product-card', grid);
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function filterProducts(query) {
+      const q = query.trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const title    = (card.dataset.title || card.querySelector('.product-title')?.textContent || '').toLowerCase();
+        const category = (card.dataset.category || '').toLowerCase();
+        const match    = !q || title.includes(q) || category.includes(q);
+
+        card.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+
+      if (meta) {
+        if (q) {
+          meta.innerHTML = `Showing <strong>${visibleCount}</strong> result${visibleCount !== 1 ? 's' : ''} for "<strong>${escapeHtml(query)}</strong>" <a href="#" class="clear-search">Clear</a>`;
+          const clear = meta.querySelector('.clear-search');
+          if (clear) {
+            clear.addEventListener('click', (e) => {
+              e.preventDefault();
+              input.value = '';
+              filterProducts('');
+              input.focus();
+            });
+          }
         } else {
-            scrollTopBtn.classList.remove('visible');
+          meta.textContent = '';
         }
+      }
+
+      let emptyMsg = $('.search-empty', grid);
+      if (visibleCount === 0 && q) {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('p');
+          emptyMsg.className = 'empty-message search-empty';
+          emptyMsg.textContent = `No products found for "${query}". Try a different term.`;
+          grid.appendChild(emptyMsg);
+        } else {
+          emptyMsg.textContent = `No products found for "${query}". Try a different term.`;
+          emptyMsg.style.display = '';
+        }
+      } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
     }
 
-    window.addEventListener('scroll', toggleScrollTop, { passive: true });
-    toggleScrollTop();
-
-    if (scrollTopBtn) {
-        scrollTopBtn.addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
-
-    // ─── Smooth Scroll for Anchor Links ───
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            if (targetId === '#' || targetId === '') return;
-
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                e.preventDefault();
-                const headerHeight = header ? header.offsetHeight : 0;
-                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
-
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
+    let timer;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => filterProducts(input.value), 150);
     });
 
-    // ─── Active Nav Link on Scroll ───
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.main-nav .nav-link[href^="#"]');
-
-    function setActiveNav() {
-        if (sections.length === 0 || navLinks.length === 0) return;
-        const scrollPos = window.pageYOffset + 100;
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
-
-            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === '#' + sectionId) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-        });
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        filterProducts(input.value);
+      });
     }
 
-    window.addEventListener('scroll', setActiveNav, { passive: true });
+    const params = new URLSearchParams(window.location.search);
+    const initialQ = params.get('q');
+    if (initialQ) {
+      input.value = initialQ;
+      filterProducts(initialQ);
+    }
+  }
 
-    // ─── Parallax Effect for Hero ───
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const rate = scrolled * 0.3;
-            if (scrolled < hero.offsetHeight) {
-                hero.style.backgroundPositionY = rate + 'px';
-            }
-        }, { passive: true });
+  /* ----------------------------------------------------------
+     10. Active Nav Link on Page Scroll
+     ---------------------------------------------------------- */
+  function initActiveNav() {
+    const sections = $$('section[id]');
+    const links    = $$('.main-nav .nav-link[href^="#"]');
+    if (!sections.length || !links.length) return;
+
+    function updateActiveLink() {
+      const pos = window.pageYOffset + 120;
+      sections.forEach(section => {
+        const top    = section.offsetTop;
+        const height = section.offsetHeight;
+        if (pos >= top && pos < top + height) {
+          links.forEach(link => {
+            const isActive = link.getAttribute('href') === '#' + section.id;
+            link.classList.toggle('active', isActive);
+          });
+        }
+      });
     }
 
-    // ─── Flash Message Auto-Dismiss ───
-    const flashMessages = document.querySelectorAll('.flash-message');
-    flashMessages.forEach(msg => {
-        setTimeout(() => {
-            msg.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            msg.style.opacity = '0';
-            msg.style.transform = 'translateY(-20px)';
-            setTimeout(() => {
-                if (msg.parentNode) {
-                    msg.parentNode.removeChild(msg);
-                }
-            }, 500);
-        }, 5000);
-    });
+    window.addEventListener('scroll', updateActiveLink, { passive: true });
+  }
 
-    // ─── Input Focus Effects ───
-    document.querySelectorAll('input, textarea, select').forEach(input => {
-        input.addEventListener('focus', function() {
-            if (this.parentElement) {
-                this.parentElement.classList.add('input-focused');
-            }
-        });
-
-        input.addEventListener('blur', function() {
-            if (this.parentElement) {
-                this.parentElement.classList.remove('input-focused');
-            }
-        });
-    });
-
-    // ─── Lazy Load Images ───
-    const lazyImages = document.querySelectorAll('img[data-src]');
-
-    if ('IntersectionObserver' in window && lazyImages.length > 0) {
-        const imageObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    if (img.dataset.src) {
-                        img.src = img.dataset.src;
-                        img.removeAttribute('data-src');
-                    }
-                    imageObserver.unobserve(img);
-                }
-            });
-        });
-
-        lazyImages.forEach(img => imageObserver.observe(img));
-    } else if (lazyImages.length > 0) {
-        lazyImages.forEach(img => {
-            if (img.dataset.src) {
-                img.src = img.dataset.src;
-            }
-        });
-    }
-
-    // ─── Stagger Animation for Grids ───
-    const grids = document.querySelectorAll('.stats-grid, .services-grid, .features-grid, .steps-container');
+  /* ----------------------------------------------------------
+     11. Stagger Delay Calculations for Grids
+     ---------------------------------------------------------- */
+  function initGridStagger() {
+    const grids = $$('.product-grid, .stats-grid, .services-grid, .features-grid, .steps-container');
     grids.forEach(grid => {
-        const items = grid.children;
-        Array.from(items).forEach((item, index) => {
-            item.style.transitionDelay = (index * 0.1) + 's';
-        });
+      Array.from(grid.children).forEach((child, index) => {
+        child.style.transitionDelay = (index * 0.05) + 's';
+      });
     });
+  }
 
-    // ─── Touch Device Detection ───
-    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-    if (isTouchDevice) {
-        document.body.classList.add('touch-device');
-    }
-
-    // ─── Resize Handler ───
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            if (window.innerWidth > 768) {
-                if (mainNav && mainNav.classList.contains('active')) {
-                    closeMenu();
-                }
-                restoreNavForDesktop();
-            }
-        }, 250);
-    });
-
-    // ─── Password Toggle ───
-    document.querySelectorAll('.password-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const input = this.previousElementSibling;
-            const icon = this.querySelector('i');
-
-            if (!input || !icon) return;
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-    });
-
-    console.log('\u2705 CodeAlpha E-commerce JS initialized');
-});
-// Quick preloader hide (fallback if main.js fails)
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        var preloader = document.getElementById('preloader');
-        if (preloader) {
-            preloader.classList.add('hidden');
-        }
-    }, 3000);
-});
+  /* ----------------------------------------------------------
+     Initialization
+     ---------------------------------------------------------- */
+  document.addEventListener('DOMContentLoaded', () => {
+    initPreloader();
+    initMobileNav();
+    initScrollEffects();
+    initReveal();
+    initLazyImages();
+    initFlashMessages();
+    initPasswordToggle();
+    initSmoothAnchors();
+    initProductSearch();
+    initActiveNav();
+    initGridStagger();
+  });
+})();
