@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+
+    <div class="breadcrumb-nav">
+        <a href="{% url 'products:product_list' %}">← Back to Products</a>
+    </div>
+
+    <div class="product-detail-layout">
+        <!-- Product Image Gallery View -->
+        <div class="detail-image-card">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-image">
+            {% else %}
+                <div class="no-image-large">No Image Available</div>
+            {% endif %}
+        </div>
+
+        <!-- Product Information & Actions -->
+        <div class="detail-info-card">
+            <span class="detail-category">{{ product.category.name }}</span>
+            <h1 class="detail-title">{{ product.name }}</h1>
+            <p class="detail-price">${{ product.price }}</p>
+
+            <div class="stock-status">
+                {% if product.is_available and product.stock > 0 %}
+                    <span class="badge in-stock">In Stock ({{ product.stock }} left)</span>
+                {% else %}
+                    <span class="badge out-of-stock">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <hr class="summary-divider">
+
+            <div class="detail-description">
+                <h3>Description</h3>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <hr class="summary-divider">
+
+            <div class="detail-actions">
+                {% if product.is_available and product.stock > 0 %}
+                    <form action="{% url 'cart:cart_add' product_id=product.id %}" method="POST" class="action-form flex-1">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-cart full-width btn-lg">Add to Cart</button>
+                    </form>
+                {% endif %}
+
+                <form action="{% url 'wishlist:wishlist_add' product_id=product.id %}" method="POST" class="action-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-wishlist btn-lg" title="Add to Wishlist">♥ Save to Wishlist</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

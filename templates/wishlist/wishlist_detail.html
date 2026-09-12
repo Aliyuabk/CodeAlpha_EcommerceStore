@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Wishlist - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="wishlist-container">
+
+    <h2 class="page-title">My Wishlist</h2>
+
+    {% if wishlist_items %}
+        <div class="product-grid">
+            {% for item in wishlist_items %}
+                <div class="product-card">
+                    <div class="image-wrapper">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+                        {% else %}
+                            <div class="no-image">No Image Available</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <h3 class="product-title">{{ item.product.name }}</h3>
+                        <p class="product-price">${{ item.product.price }}</p>
+                        
+                        <div class="card-actions">
+                            <!-- Move to Cart Button -->
+                            <form action="{% url 'wishlist:wishlist_move_to_cart' item_id=item.id %}" method="POST" class="action-form flex-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-cart full-width">Move to Cart</button>
+                            </form>
+
+                            <!-- Remove from Wishlist Button -->
+                            <form action="{% url 'wishlist:wishlist_remove' item_id=item.id %}" method="POST" class="action-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-remove-wishlist" title="Remove Item">✕</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-cart-state">
+            <p>Your wishlist is currently empty.</p>
+            <a href="{% url 'products:product_list' %}" class="btn btn-cart">Explore Products</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

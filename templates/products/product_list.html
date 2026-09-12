@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shop - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="products-container">
+    
+
+    <h2 class="page-title">Products</h2>
+
+    {% if products %}
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="image-wrapper">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <div class="no-image">No Image Available</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{% url 'products:product_detail' slug=product.slug %}">{{ product.name }}</a>
+                        </h3>
+                        <p class="product-price">${{ product.price }}</p>
+                        
+                        <div class="card-actions">
+                            <a href="{% url 'products:product_detail' slug=product.slug %}" class="btn btn-cart flex-1">View Details</a>
+                            
+                            <form action="{% url 'wishlist:wishlist_add' product_id=product.id %}" method="POST" class="action-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-wishlist" title="Save to Wishlist">♥</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-cart-state">
+            <p>No products are currently available.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

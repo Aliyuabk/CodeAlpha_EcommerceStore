@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browsing History - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="history-container">
+  
+    <div class="history-header">
+        <h2 class="page-title">Recently Viewed Products</h2>
+        {% if history_items %}
+            <form action="{% url 'history:clear_history' %}" method="POST" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-clear-history">Clear History</button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% if history_items %}
+        <div class="product-grid">
+            {% for item in history_items %}
+                <div class="product-card">
+                    <div class="image-wrapper">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+                        {% else %}
+                            <div class="no-image">No Image Available</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <span class="viewed-timestamp">Viewed {{ item.viewed_at|timesince }} ago</span>
+                        <h3 class="product-title">{{ item.product.name }}</h3>
+                        <p class="product-price">${{ item.product.price }}</p>
+                        
+                        <div class="card-actions">
+                            <a href="{% url 'products:product_detail' item.product.id %}" class="btn btn-cart flex-1">View Item</a>
+
+                            <form action="{% url 'history:remove_history_item' item_id=item.id %}" method="POST" class="action-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-remove-wishlist" title="Remove from History">✕</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-cart-state">
+            <p>You haven't viewed any products recently.</p>
+            <a href="{% url 'products:product_list' %}" class="btn btn-cart">Explore Products</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

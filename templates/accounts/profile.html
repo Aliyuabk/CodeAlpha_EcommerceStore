@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Account - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="accounts-container">
+    <div class="profile-layout">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <span>{{ user.username|slice:":1"|upper }}</span>
+            </div>
+            <h2 class="profile-name">{{ user.username }}</h2>
+            <p class="profile-email">{{ user.email|default:"No email registered" }}</p>
+            <p class="profile-joined">Member since {{ user.date_joined|date:"F Y" }}</p>
+
+            <hr class="summary-divider">
+
+            <a href="{% url 'accounts:logout' %}" class="btn btn-logout full-width">Logout</a>
+        </div>
+
+        <div class="profile-dashboard">
+            <h3 class="card-subtitle">Recent Orders</h3>
+
+            {% if recent_orders %}
+                <div class="orders-list">
+                    {% for order in recent_orders %}
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <span class="order-id">Order #{{ order.id }}</span>
+                                    <span class="order-date">{{ order.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <span class="order-status status-{{ order.status|lower }}">{{ order.status }}</span>
+                            </div>
+                            <div class="order-body flex-between">
+                                <span>Total: <strong>${{ order.total_amount }}</strong></span>
+                                <a href="{% url 'orders:order_detail' order_id=order.id %}" class="btn btn-view">View Details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'orders:order_list' %}" class="view-all-link">View All Orders →</a>
+            {% else %}
+                <p class="empty-text">No recent orders found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

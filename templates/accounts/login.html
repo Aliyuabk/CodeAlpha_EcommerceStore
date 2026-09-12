@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle">Sign in to your CAlpha Store account</p>
+
+        <form method="POST" action="{% url 'accounts:login' %}" class="auth-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span class="error-text">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-cart full-width btn-auth">Sign In</button>
+        </form>
+
+        <p class="auth-footer">
+            Don't have an account? <a href="{% url 'accounts:register' %}">Sign Up</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

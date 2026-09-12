@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.id }} - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+
+    <div class="order-detail-card">
+        <div class="order-header">
+            <h2>Order #{{ order.id }} Details</h2>
+            <span class="order-status status-{{ order.status|lower }}">{{ order.status }}</span>
+        </div>
+
+        <div class="shipping-info-block">
+            <h4>Shipping Address</h4>
+            <p>{{ order.full_name }}</p>
+            <p>{{ order.address }}, {{ order.city }}, {{ order.postal_code }}</p>
+            <p>Phone: {{ order.phone }}</p>
+        </div>
+
+        <h4>Items Ordered</h4>
+        <div class="cart-items-wrapper">
+            {% for item in order.items.all %}
+                <div class="cart-item-card">
+                    <div class="cart-item-details">
+                        <h3 class="cart-item-title">{{ item.product.name }}</h3>
+                        <p class="cart-item-price">${{ item.price }} x {{ item.quantity }}</p>
+                    </div>
+                    <div class="cart-item-subtotal">
+                        ${{ item.price }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="summary-row total-row" style="margin-top: 1.5rem;">
+            <span>Total Amount Paid</span>
+            <span>${{ order.total_amount }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - CAlpha Store{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+    <h2 class="page-title">Checkout</h2>
+
+    <form method="POST" action="{% url 'orders:checkout' %}" class="checkout-layout">
+        {% csrf_token %}
+        <div class="checkout-form-card">
+            <h3 class="card-subtitle">Shipping Information</h3>
+            
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" required class="form-input">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" value="{{ request.user.email }}" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" name="phone" required class="form-input">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Street Address</label>
+                <input type="text" id="address" name="address" required class="form-input">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="postal_code">Postal Code</label>
+                    <input type="text" id="postal_code" name="postal_code" required class="form-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-summary-card">
+            <h3>Order Review</h3>
+            <div class="checkout-items">
+                {% for item in cart_items %}
+                    <div class="review-item">
+                        <span>{{ item.quantity }}x {{ item.product.name }}</span>
+                        <span>${{ item.subtotal }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <hr class="summary-divider">
+            <div class="summary-row total-row">
+                <span>Total Due</span>
+                <span>${{ total_price }}</span>
+            </div>
+            <button type="submit" class="btn btn-checkout">Place Order</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
