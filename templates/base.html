@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-Commerce Store{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230F172A'/><path d='M 44 22 C 36 15, 22 18, 21 32 C 20 46, 36 49, 44 42' fill='none' stroke='%2306B6D4' stroke-width='6' stroke-linecap='round'/><circle cx='32' cy='32' r='4.5' fill='%2306B6D4'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
+     viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231f2937'/><path d='M 44 22 C 36 15, 22 18,
+      21 32 C 20 46, 36 49, 44 42' fill='none' stroke='%23f26522' stroke-width='6' stroke-linecap='round'/><circle 
+      cx='32' cy='32' r='4.5' fill='%23f26522'/></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">   
 </head>
 <body>
@@ -21,9 +24,9 @@
 <div class="top-bar desktop-only">
     <div class="container">
         <div class="top-bar-left">
-            <a href="tel:080xxxxxxx00"><i class="fas fa-phone"></i> 080xxxxxxx00</a>
+            <a href="tel:+2348034897634"><i class="fas fa-phone"></i> +2348034897634</a>
             <span class="top-bar-separator">|</span>
-            <a href="mailto:codeapha@ecommerce.com"><i class="fas fa-envelope"></i> codeapha@ecommerce.com</a>
+            <a href="mailto:aliyuabubakar11117@gmail.com"><i class="fas fa-envelope"></i> aliyuabubakar11117@gmail.com</a>
         </div>
         <div class="top-bar-right"> 
             {% if user.is_authenticated %}
@@ -43,11 +46,11 @@
     <div class="container header-container"> 
         <a href="{% url 'products:product_list' %}" class="logo">
             <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 60' width='240'
-             height='60'><rect x='5' y='5' width='50' height='50' rx='12' fill='%230F172A'/><path d='M 38 21 C 32 16, 21
-              18, 20 30 C 19 42, 32 44, 38 39' fill='none' stroke='%2306B6D4' stroke-width='4.5' stroke-linecap='round'/>
-              <circle cx='29' cy='30' r='3.5' fill='%2306B6D4'/><text x='70' y='36' font-family='sans-serif' font-weight='800' 
-              font-size='24' fill='%230F172A' letter-spacing='1.5'>CALPHA</text><text x='71' y='49' font-family='sans-serif' 
-              font-weight='600' font-size='10' fill='%2364748B' letter-spacing='3'>E - COMMERCE</text></svg>" alt="CALPHA Logo" class="hide" />
+             height='60'><rect x='5' y='5' width='50' height='50' rx='12' fill='%231f2937'/><path d='M 38 21 C 32 16, 21
+              18, 20 30 C 19 42, 32 44, 38 39' fill='none' stroke='%23f26522' stroke-width='4.5' stroke-linecap='round'/><circle
+               cx='29' cy='30' r='3.5' fill='%23f26522'/><text x='70' y='36' font-family='sans-serif' font-weight='800' font-size='24'
+                fill='%231f2937' letter-spacing='1.5'>CALPHA</text><text x='71' y='49' font-family='sans-serif' font-weight='600' 
+                font-size='10' fill='%236b7280' letter-spacing='3'>E - COMMERCE</text></svg>" alt="CALPHA Logo" class="hide" />
         </a> 
 
         <!-- Search Bar Block (Overridden only on Shop Page) -->
