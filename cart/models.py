@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from products.models import Product
 
 class Cart(models.Model):
@@ -18,7 +19,11 @@ class Cart(models.Model):
         return sum(item.get_total_price() for item in self.items.all())
 
     def __str__(self):
-        return f"Cart ({self.user or self.session_id})"
+        try:
+            user_str = str(self.user) if self.user else self.session_id
+        except ObjectDoesNotExist:
+            user_str = f"Deleted User (Session: {self.session_id})"
+        return f"Cart ({user_str})"
 
 
 class CartItem(models.Model):

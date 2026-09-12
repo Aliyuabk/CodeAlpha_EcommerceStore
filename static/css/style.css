@@ -348,7 +348,280 @@ main {
   0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
   40%           { transform: scale(1) translateY(-20px); opacity: 1; box-shadow: var(--shadow-accent); }
 }
+:root {
+        --primary-color: #ff6b00;
+        --bg-light: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-main: #333333;
+        --text-muted: #777777;
+        --border-color: #eee;
+    }
 
+    body {
+        background-color: var(--bg-light);
+        color: var(--text-main);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        padding-bottom: 70px;
+    }
+
+    /* Search Header */
+    .app-header {
+        background-color: #fff;
+        padding: 12px 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .search-box {
+        background-color: #f1f3f4;
+        border-radius: 20px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .search-box input {
+        border: none;
+        background: transparent;
+        width: 100%;
+        outline: none;
+    }
+
+    /* Cards */
+    .profile-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 16px;
+        margin: 16px 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-title a {
+        font-size: 0.85rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    /* Avatar & Header Section */
+    .user-avatar-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .avatar-img {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary-color);
+    }
+
+    .btn-edit-profile {
+        background: #fff3e0;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-edit-profile:hover {
+        background: var(--primary-color);
+        color: #fff;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(3px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Modal Content Container */
+    .modal-container {
+        background: #fff;
+        width: 90%;
+        max-width: 450px;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        transform: translateY(20px) scale(0.95);
+        transition: transform 0.3s ease;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-container {
+        transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
+
+    .modal-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        line-height: 1;
+    }
+
+    /* Form Styling */
+    .form-group {
+        margin-bottom: 12px;
+    }
+    .form-group label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 4px;
+    }
+    .form-control-custom {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        box-sizing: border-box;
+    }
+    .btn-submit {
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 8px;
+    }
+
+    /* Products Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .mini-product-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px;
+        position: relative;
+    }
+    .mini-product-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: contain;
+        border-radius: 6px;
+    }
+    .mini-product-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 6px 0 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .mini-product-price {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #000;
+    }
+
+    /* Orders List */
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.85rem;
+    }
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    .badge-status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #fff3e0;
+        color: var(--primary-color);
+    }
+
+    /* Navigation Bar */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: #ffffff;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 1px solid var(--border-color);
+        z-index: 1000;
+    }
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+    .nav-item.active {
+        color: var(--primary-color);
+    }
+    .nav-item i {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
 /* ============================================================
    7. TOP BAR
    ============================================================ */

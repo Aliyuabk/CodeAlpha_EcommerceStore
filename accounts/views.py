@@ -3,7 +3,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
 from orders.models import Order
+from wishlist.models import Wishlist
+from history.models import ProductHistory
 from .forms import CustomUserCreationForm
 
 def register_view(request):
@@ -46,20 +49,38 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    """Display profile dashboard and handle profile detail updates."""
+    """Display profile dashboard with profile details, orders, wishlist, and viewing history."""
+    profile = request.user.profile
+
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        
-        user = request.user
-        user.username = username
-        user.email = email
-        user.save()
+        # Update User fields
+        request.user.username = request.POST.get('username', request.user.username)
+        request.user.email = request.POST.get('email', request.user.email)
+        request.user.save()
+
+        # Update Profile fields
+        profile.phone_number = request.POST.get('phone_number', profile.phone_number)
+        profile.address = request.POST.get('address', profile.address)
+        profile.city = request.POST.get('city', profile.city)
+        profile.postal_code = request.POST.get('postal_code', profile.postal_code)
+
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+
+        profile.save()
         messages.success(request, "Your profile has been updated successfully!")
         return redirect('accounts:profile')
 
-    recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:3]
-    return render(request, 'accounts/profile.html', {
+    # Fetch dynamic user metrics and lists
+    recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:5]
+    wishlist_items = Wishlist.objects.filter(user=request.user).select_related('product')[:6]
+    recently_viewed = ProductHistory.objects.filter(user=request.user).select_related('product')[:6]
+
+    context = {
         'user': request.user,
-        'recent_orders': recent_orders
-    })
+        'profile': profile,
+        'recent_orders': recent_orders,
+        'wishlist_items': wishlist_items,
+        'recently_viewed': recently_viewed,
+    }
+    return render(request, 'accounts/profile.html', context)

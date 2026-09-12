@@ -24,7 +24,7 @@
 
 ---
 
-##  Features
+## ✨ Features
 
 <table>
 <tr>
@@ -69,14 +69,16 @@
 
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top" colspan="2">
 
-<td width="50%" valign="top">
-Django Administrator
-- Auth(register, and login)
-- Management Order , tracking and Order status lifecycle (pending → shipped → delivered)
-- Manage cart & Wishlist
-- Manage product
-- Manage users & Group
+### 🛠️ Django Administrator
+- Authentication (register & login)
+- Order management, tracking & status lifecycle (pending → shipped → delivered)
+- Cart & wishlist management
+- Product management
+- User & group management
+
 </td>
 </tr>
 </table>
@@ -113,7 +115,7 @@ CodeAlpha_EcommerceStore/
 │   └── wsgi.py
 │
 ├── static/                 # CSS, JS, and image assets
-│   └── css/style.css
+│   ├── css/style.css
 │   └── js/main.js
 │
 ├── media/                  # User-uploaded product images
@@ -311,7 +313,7 @@ Contributions are welcome! To get started:
 
 ## 📄 License
 
-This project is licensed under the **CodeAlpha** Internship  — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **CodeAlpha Internship** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -321,6 +323,7 @@ This project is licensed under the **CodeAlpha** Internship  — see the [LICENS
 
 - GitHub: [@Aliyuabk](https://github.com/Aliyuabk)
 - Project: [CodeAlpha_EcommerceStore](https://github.com/Aliyuabk/CodeAlpha_EcommerceStore)
+- Potifolio: [@Aliyudev](https://aliyudev.kowagurutech.ng/)
 
 ---
 
@@ -330,3 +333,4 @@ This project is licensed under the **CodeAlpha** Internship  — see the [LICENS
 
 **Built with ❤️ using Django & MySQL**
 
+</div>
