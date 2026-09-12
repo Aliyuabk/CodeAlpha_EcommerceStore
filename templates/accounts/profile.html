@@ -6,6 +6,7 @@
 {% block content %}
 <div class="accounts-container">
     <div class="profile-layout">
+        <!-- Profile Info & Edit Card -->
         <div class="profile-card">
             <div class="profile-avatar">
                 <span>{{ user.username|slice:":1"|upper }}</span>
@@ -16,9 +17,27 @@
 
             <hr class="summary-divider">
 
+            <!-- Edit Profile Form -->
+            <form method="POST" action="{% url 'accounts:profile' %}" class="edit-profile-form">
+                {% csrf_token %}
+                <h4 class="form-section-title">Edit Details</h4>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" id="username" value="{{ user.username }}" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" name="email" id="email" value="{{ user.email }}" required class="form-control">
+                </div>
+                <button type="submit" class="btn btn-cart full-width">Update Profile</button>
+            </form>
+
+            <hr class="summary-divider">
+
             <a href="{% url 'accounts:logout' %}" class="btn btn-logout full-width">Logout</a>
         </div>
 
+        <!-- Dashboard / Recent Orders -->
         <div class="profile-dashboard">
             <h3 class="card-subtitle">Recent Orders</h3>
 

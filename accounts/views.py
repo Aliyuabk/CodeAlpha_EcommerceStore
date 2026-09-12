@@ -1,24 +1,25 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from orders.models import Order
+from .forms import CustomUserCreationForm
 
 def register_view(request):
-    """Handle new user registration."""
+    """Handle new user registration with full user details."""
     if request.user.is_authenticated:
         return redirect('accounts:profile')
         
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, "Registration successful!")
             return redirect('accounts:profile')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
@@ -45,7 +46,18 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    """Display profile dashboard with user information and recent orders."""
+    """Display profile dashboard and handle profile detail updates."""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        
+        user = request.user
+        user.username = username
+        user.email = email
+        user.save()
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('accounts:profile')
+
     recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:3]
     return render(request, 'accounts/profile.html', {
         'user': request.user,

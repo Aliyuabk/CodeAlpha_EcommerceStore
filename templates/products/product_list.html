@@ -3,20 +3,22 @@
 
 {% block title %}Shop - CAlpha Store{% endblock %}
 
-{% block search_bar %}
-<form class="app-search-form" onsubmit="return false;">
-    <div class="search-input-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="live-search-input" placeholder="Search for anything..." aria-label="Search">
-    </div>
-    <button type="button" class="filter-btn" aria-label="Filter/Search">
-        <i class="fas fa-sliders-h"></i>
-    </button>
-</form>
-{% endblock %}
-
 {% block content %}
 <div class="products-container">
+
+    <!-- Live Search Section at top of content -->
+    <div class="shop-search-wrapper" style="margin-bottom: 2rem;">
+        <form class="app-search-form" onsubmit="return false;">
+            <div class="search-input-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="live-search-input" placeholder="Search for anything..." aria-label="Search">
+            </div>
+            <button type="button" class="filter-btn" aria-label="Filter/Search">
+                <i class="fas fa-sliders-h"></i>
+            </button>
+        </form>
+    </div>
+
     <h2 class="page-title">Products</h2>
 
     {% if products %}
@@ -67,7 +69,7 @@
         const noMatchesMsg = document.getElementById("no-matches");
 
         if (searchInput) {
-            searchInput.addEventListener("keyup", function() {
+            searchInput.addEventListener("input", function() {
                 const query = this.value.toLowerCase().trim();
                 let visibleCount = 0;
 
