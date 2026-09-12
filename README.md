@@ -321,8 +321,3 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 **Built with ❤️ using Django & MySQL**
 
 </div>
-
-<footer align="center">
-License
-This project is open-source and developed for the CodeAlpha Internship Program.
-</footer>
