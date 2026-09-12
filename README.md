@@ -24,7 +24,7 @@
 
 ---
 
-## ✨ Features
+##  Features
 
 <table>
 <tr>
@@ -67,6 +67,16 @@
 - Order creation & tracking
 - Order status lifecycle (pending → shipped → delivered)
 
+</td>
+</tr>
+
+<td width="50%" valign="top">
+Django Administrator
+- Auth(register, and login)
+- Management Order , tracking and Order status lifecycle (pending → shipped → delivered)
+- Manage cart & Wishlist
+- Manage product
+- Manage users & Group
 </td>
 </tr>
 </table>
@@ -301,13 +311,13 @@ Contributions are welcome! To get started:
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **CodeAlpha** Internship  — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 👤 Author
 
-**Aliyu Abk**
+**AliyuAbk**
 
 - GitHub: [@Aliyuabk](https://github.com/Aliyuabk)
 - Project: [CodeAlpha_EcommerceStore](https://github.com/Aliyuabk/CodeAlpha_EcommerceStore)
@@ -320,4 +330,3 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 **Built with ❤️ using Django & MySQL**
 
-</div>
