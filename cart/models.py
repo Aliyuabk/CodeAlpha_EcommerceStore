@@ -15,7 +15,6 @@ class Cart(models.Model):
 
     @property
     def total_price(self):
-        """Calculate the total price of all items in the cart."""
         return sum(item.get_total_price() for item in self.items.all())
 
     def __str__(self):
@@ -29,7 +28,6 @@ class CartItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def get_total_price(self):
-        """Calculate line item total (product price * quantity)."""
         return self.product.price * self.quantity
 
     def __str__(self):
