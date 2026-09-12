@@ -746,7 +746,16 @@ main {
   color: var(--color-text-subtle);
   font-size: var(--fs-sm);
 }
-
+.cart-badge {
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 9999px;
+  padding: 2px 7px;
+  margin-left: 4px;
+ vertical-align: middle;
+}
 .product-info {
   display: flex;
   flex-direction: column;
